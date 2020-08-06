@@ -1,5 +1,4 @@
 var canvasWidth = 500, canvasHeight = 400;
-var myBall;
 var ballSize = 20;
 var myBall_xPos = canvasWidth/2, myBall_yPos = canvasHeight/2,
 	myBall_xVel = 0, myBall_yVel = 0,
@@ -19,13 +18,15 @@ var paddleWidth = 10, paddleLength = canvasHeight/6, paddleVel = 5,
 	paddleR_left   = paddleR_xPos + paddleWidth/2,
 	paddleR_right  = paddleR_xPos - paddleWidth/2;
 var r = 0, g = 0, b = 0;
+var speeds = [ -4, -3, -2, 2, 3, 4 ];
 
 function setup() {
+	// frameRate(10);
 	createCanvas(canvasWidth, canvasHeight);
 	background(color(r,g,b));
 	rectMode(CENTER);
-	myBall_xVel = random(-3,4);
-	myBall_yVel = random(-3,4);
+	myBall_xVel = random(speeds);
+	myBall_yVel = random(speeds);
 }
 
 function draw() {
@@ -42,15 +43,18 @@ function moveAndBounceWall() {
 	myBall_xPos  = myBall_xPos + myBall_xVel;
 	myBall_left  = myBall_xPos - ballSize/2;
 	myBall_right = myBall_xPos + ballSize/2;
-	if ( (myBall_right > canvasWidth) || (myBall_left < 0) ) {
-		myBall_xVel = -myBall_xVel;
+	if ( (myBall_right >= canvasWidth) || (myBall_left <= 0) ) {
+		myBall_xPos = canvasWidth / 2;
+		myBall_yPos = canvasHeight / 2;
+		myBall_xVel = random(speeds);
+		myBall_yVel = random(speeds);
 		colorChange();
 	}
 
 	myBall_yPos   = myBall_yPos + myBall_yVel;
 	myBall_top    = myBall_yPos - ballSize/2;
 	myBall_bottom = myBall_yPos + ballSize/2;
-	if ( (myBall_bottom > canvasHeight) || (myBall_top < 0) ) {
+	if ( (myBall_bottom >= canvasHeight) || (myBall_top <= 0) ) {
 		myBall_yVel = -myBall_yVel;
 		colorChange();
 	}
@@ -88,7 +92,7 @@ var bounceL = 0;
 var bounceR = 0;
 function bouncePaddles() {
 	if ((myBall_bottom >= paddleL_top) && (myBall_top <= paddleL_bottom)) {
-		if (myBall_left <= paddleL_right) {
+		if (myBall_left <= paddleL_right+10) {
 			myBall_xVel = -myBall_xVel;
 			bounceL++;
 			console.log("Bounce Left  " + bounceL);
@@ -96,13 +100,34 @@ function bouncePaddles() {
 	}
 
 	if ((myBall_bottom >= paddleR_top) && (myBall_top <= paddleR_bottom)) {
-		if (myBall_right >= paddleR_left) {
+		if (myBall_right >= paddleR_left-10) {
 			myBall_xVel = -myBall_xVel;
 			bounceR++;
 			console.log("Bounce Right " + bounceR);
 		}
 	}
 }
+
+function updateScore() {
+	if (myBall_right >= canvasWidth) {
+		scoreL++;
+	}
+
+	if (myBall_left <= 0) {
+		scoreR++;
+	}
+}
+
+function displayScore() {
+	fill(color(0,0,0));
+	textSize(15);
+	text("Score: " + scoreL, canvasWidth/4, ballSize);
+	text("Score: " + scoreR, canvasWidth * 0.75, ballSize);
+}
+
+
+
+
 
 // make shapes (game paddles, ball)		DONE
 // motion								DONE
